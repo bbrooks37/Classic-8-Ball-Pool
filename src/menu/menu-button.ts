@@ -1,74 +1,71 @@
-import { IInputConfig, ICursorConfig, IVector2 } from './../game.config.type';
+import { IVector2, IAssetsConfig } from './../game.config.type'; // Removed ICursorConfig
 import { IMenuCommand } from './commands/menu-command';
-import { GameConfig } from '../game.config';
-import { Mouse } from '../input/mouse';
-import { Canvas2D } from '../canvas';
 import { Assets } from '../assets';
-import { IAssetsConfig } from '../game.config.type';
+import { Canvas2D } from '../canvas';
+import { Mouse } from '../input/mouse';
+import { GameConfig } from '../game.config'; // Import GameConfig to access cursorConfig
+import { Vector2 } from '../geom/vector2'; // Ensure Vector2 is imported
 
 //------Configurations------//
 
-const inputConfig: IInputConfig = GameConfig.input;
-const cursorConfig: ICursorConfig = GameConfig.cursor;
+const cursorConfig = GameConfig.cursor; // Access cursorConfig directly from GameConfig
 const sprites: IAssetsConfig = GameConfig.sprites;
 
 export class MenuButton {
 
     //------Members------//
 
-    private _activeSprite: HTMLImageElement;
+    private _sprite: HTMLImageElement;
+    private _spriteOnHover: HTMLImageElement;
     private _hovered: boolean;
-
-    //------Properties------//
-
-    private set hovered(value: boolean) {
-        this._hovered = value;
-    }
 
     //------Constructor------//
 
     constructor(
-        private _command: IMenuCommand,
+        private _action: IMenuCommand,
         private _value: any,
-        private _position: IVector2, 
-        private _spriteKey: string, 
-        private _spriteOnHoverKey: string,
+        private _position: IVector2,
+        sprite: string,
+        spriteOnHover: string,
     ) {
-        this._activeSprite = Assets.getSprite(sprites.paths[this._spriteKey]);
+        this._sprite = Assets.getSprite(sprites.paths[sprite]);
+        this._spriteOnHover = Assets.getSprite(sprites.paths[spriteOnHover]);
     }
 
     //------Private Methods------//
 
-    private isInsideButton(position: IVector2) {
-        return position.x > this._position.x &&
-               position.x < this._position.x + this._activeSprite.width &&
-               position.y > this._position.y &&
-               position.y < this._position.y + this._activeSprite.height;
+    private isHovered(): boolean {
+        const mouseX = Mouse.position.x;
+        const mouseY = Mouse.position.y;
+        const buttonX = this._position.x - this._sprite.width / 2;
+        const buttonY = this._position.y - this._sprite.height / 2;
+        const buttonWidth = this._sprite.width;
+        const buttonHeight = this._sprite.height;
+
+        return mouseX >= buttonX &&
+               mouseX <= buttonX + buttonWidth &&
+               mouseY >= buttonY &&
+               mouseY <= buttonY + buttonHeight;
     }
 
     //------Public Methods------//
-    
-    public handleInput() {
-
-        this.hovered = this.isInsideButton(Mouse.position);
-        this._activeSprite = this._hovered ? 
-                             Assets.getSprite(sprites.paths[this._spriteOnHoverKey]) : 
-                             Assets.getSprite(sprites.paths[this._spriteKey]);
-
-        if(this._hovered && Mouse.isPressed(inputConfig.mouseSelectButton)) {
-            Canvas2D.changeCursor(cursorConfig.default);
-            this._command.execute(this._value);
-        }
-    }
 
     public update(): void {
-        this.handleInput();
+        const prevHovered = this._hovered;
+        this._hovered = this.isHovered();
+
+        if (this._hovered) {
+            Canvas2D.changeCursor(cursorConfig.button);
+            if (Mouse.isPressed(GameConfig.input.mouseSelectButton)) {
+                this._action.execute(this._value);
+            }
+        } else if (prevHovered) {
+            Canvas2D.changeCursor(cursorConfig.default);
+        }
     }
 
     public draw(): void {
-        if(this._hovered) {
-            Canvas2D.changeCursor(cursorConfig.button);
-        }
-        Canvas2D.drawImage(this._activeSprite, this._position);
+        const spriteToDraw = this._hovered ? this._spriteOnHover : this._sprite;
+        Canvas2D.drawImage(spriteToDraw, this._position, 0, new Vector2(this._sprite.width / 2, this._sprite.height / 2));
     }
 }

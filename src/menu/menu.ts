@@ -1,4 +1,4 @@
-import { IMenuConfig, IButton, ILabel, ICursorConfig, IAssetsConfig } from './../game.config.type';
+import { IMenuConfig, ILabel, IAssetsConfig, IMenuButton } from './../game.config.type'; // Corrected IButton to IMenuButton, removed ICursorConfig
 import { IMenuCommand } from './commands/menu-command';
 import { MenuButton } from './menu-button';
 import { Assets } from '../assets';
@@ -9,7 +9,7 @@ import { MenuLabel } from './menu-label';
 
 //------Configurations------//
 
-const cursorConfig: ICursorConfig = GameConfig.cursor;
+const cursorConfig = GameConfig.cursor; // Access directly from GameConfig
 const sprites: IAssetsConfig = GameConfig.sprites;
 
 export class Menu {
@@ -34,7 +34,7 @@ export class Menu {
     //------Public Methods------//
 
     public init(actionsMap: Map<MenuActionType, IMenuCommand>, config: IMenuConfig): void {
-        this._buttons = config.buttons.map((button: IButton) => {
+        this._buttons = config.buttons.map((button: IMenuButton) => { // Changed IButton to IMenuButton
             return new MenuButton(
                     actionsMap.get(button.action),
                     button.value,
@@ -44,9 +44,8 @@ export class Menu {
                 );
         });
 
-        // MODIFIED LABELS INITIALIZATION:
         this._labels = config.labels.map((label: ILabel) => {
-            return new MenuLabel(label); // <-- PASS THE ENTIRE 'label' OBJECT HERE
+            return new MenuLabel(label);
         });
 
         this._subMenus = config.subMenus.map((menu: IMenuConfig) => {

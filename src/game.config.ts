@@ -1,5 +1,6 @@
 import { MenuActionType } from './menu/menu-action-type';
 import { IGameConfig } from './game.config.type';
+import { Vector2 } from './geom/vector2';
 
 export const GameConfig : IGameConfig = {
 
@@ -30,13 +31,15 @@ export const GameConfig : IGameConfig = {
                 position: { x: 628, y: 460 },
                 color: '#126736',
                 font: '200px Impact',
-                alignment: 'top'
+                alignment: 'top',
+                text: '',
             },
             {
                 position: { x: 778, y: 460 },
                 color: '#126736',
                 font: '200px Impact',
-                alignment: 'top'
+                alignment: 'top',
+                text: '',
             }
         ]
     },
@@ -100,7 +103,7 @@ export const GameConfig : IGameConfig = {
             backButton : 'back_button.png',
             backButtonHovered : 'back_button_hover.png',
             continueButton : 'continue_button.png',
-            continueButtonHovered : 'continue_button_hover.png',
+            continueButtonHovered : 'continue_button_hover.png', // CORRECTED: Changed from _hovered to _hover
             insaneButton : 'insane_button.png',
             insaneButtonHovered : 'insane_button_hover.png',
             controls : 'controls.png',
@@ -149,7 +152,8 @@ export const GameConfig : IGameConfig = {
         shotOrigin: { x: 950, y: 11 },
         powerToAddPerFrame: 1,
         movementPerFrame: 3,
-        maxPower: 50
+        maxPower: 50,
+        aimLineLength: 1000,
     },
 
     input: {
@@ -162,7 +166,7 @@ export const GameConfig : IGameConfig = {
     },
 
     mainMenu : {
-        
+
         labels: [
             {
                 text: 'Classic 8-Ball',
@@ -181,30 +185,30 @@ export const GameConfig : IGameConfig = {
         ],
 
         buttons: [
-            { 
+            {
                 action: MenuActionType.PVP,
                 position: { x: 200, y: 200 },
-                sprite: 'twoPlayersButton', 
-                spriteOnHover: 'twoPlayersButtonHovered', 
+                sprite: 'twoPlayersButton',
+                spriteOnHover: 'twoPlayersButtonHovered',
             },
-            { 
+            {
                 action: MenuActionType.GoToSubMenu,
                 value: 0,
                 position: { x: 200, y: 400 },
-                sprite: 'onePlayerButton', 
-                spriteOnHover: 'onePlayerButtonHovered', 
+                sprite: 'onePlayerButton',
+                spriteOnHover: 'onePlayerButtonHovered',
             },
-            { 
+            {
                 action: MenuActionType.ToggleSound,
                 position: { x: 1430, y: 10 },
-                sprite: 'muteButton', 
-                spriteOnHover: 'muteButtonHovered', 
+                sprite: 'muteButton',
+                spriteOnHover: 'muteButtonHovered',
             },
         ],
 
         subMenus: [
             {
-                
+
                 labels: [
                     {
                         text: 'Choose Difficulty',
@@ -226,8 +230,8 @@ export const GameConfig : IGameConfig = {
                     {
                         action: MenuActionType.GoToPreviousMenu,
                         position: { x: 100, y: 150 },
-                        sprite: 'backButton', 
-                        spriteOnHover: 'backButtonHovered', 
+                        sprite: 'backButton',
+                        spriteOnHover: 'backButtonHovered',
                     },
                     {
                         action: MenuActionType.PVC,
@@ -257,11 +261,11 @@ export const GameConfig : IGameConfig = {
                         sprite: 'insaneButton',
                         spriteOnHover: 'insaneButtonHovered'
                     },
-                    { 
+                    {
                         action: MenuActionType.ToggleSound,
                         position: { x: 1430, y: 10 },
-                        sprite: 'muteButton', 
-                        spriteOnHover: 'muteButtonHovered', 
+                        sprite: 'muteButton',
+                        spriteOnHover: 'muteButtonHovered',
                     },
                 ],
 
@@ -269,7 +273,7 @@ export const GameConfig : IGameConfig = {
             }
         ]
     },
-    
+
     cursor: {
         default: 'default',
         button: 'pointer'

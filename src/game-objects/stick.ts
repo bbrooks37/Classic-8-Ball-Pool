@@ -25,13 +25,14 @@ export class Stick {
     private _power: number = 0;
     private _movable: boolean = true;
     private _visible: boolean = true;
+    private _aimLineLength: number = stickConfig.aimLineLength; // NEW: Max length for the aim line
 
     //------Properties------//
 
     public get position() : Vector2 {
         return Vector2.copy(this._position);
     }
-    
+
     public get rotation(): number {
         return this._rotation;
     }
@@ -71,7 +72,7 @@ export class Stick {
         this._power -= stickConfig.powerToAddPerFrame;
         this._origin.addToX(-stickConfig.movementPerFrame);
     }
-    
+
     private isLessThanMaxPower(): boolean {
         return this._power < stickConfig.maxPower;
     }
@@ -130,4 +131,23 @@ export class Stick {
         }
     }
 
+    /**
+     * Calculates the end position of the aiming line based on stick position and rotation.
+     * @returns A Vector2 representing the end point of the aiming line, or null if stick is not visible.
+     */
+    public getAimLineEndPosition(): Vector2 {
+        if (!this.visible) {
+            return null;
+        }
+
+        // The start of the line is the cue ball's center (which the stick is aligned with)
+        const startPoint = this.position;
+
+        // Calculate the end point based on stick's rotation and a desired length
+        const angle = this._rotation; // Assuming _rotation is in radians
+        const endPointX = startPoint.x + this._aimLineLength * Math.cos(angle);
+        const endPointY = startPoint.y + this._aimLineLength * Math.sin(angle);
+
+        return new Vector2(endPointX, endPointY);
+    }
 }

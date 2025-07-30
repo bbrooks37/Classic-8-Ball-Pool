@@ -320,8 +320,8 @@ export class GameWorld {
             labelsConfig.currentPlayer.font,
             labelsConfig.currentPlayer.color,
             labelsConfig.currentPlayer.position,
-            'center',
-            labelsConfig.currentPlayer.alignment as CanvasTextBaseline
+            'center', // Set horizontal alignment to 'center'
+            labelsConfig.currentPlayer.alignment as CanvasTextBaseline // Pass original alignment as textBaseline
         );
     }
 
@@ -342,8 +342,8 @@ export class GameWorld {
                 labelsConfig.overalScores[i].font,
                 labelsConfig.overalScores[i].color,
                 labelsConfig.overalScores[i].position,
-                'center',
-                labelsConfig.overalScores[i].alignment as CanvasTextBaseline
+                'center', // Set horizontal alignment to 'center'
+                labelsConfig.overalScores[i].alignment as CanvasTextBaseline // Pass original alignment as textBaseline
             );
         }
     }
@@ -383,7 +383,7 @@ export class GameWorld {
             ... yellowBalls,
             this._8Ball,
             this._cueBall,
-        ]; // <--- CLOSING BRACKET WAS MISSING HERE
+        ];
 
         this._currentPlayerIndex = 0;
 
@@ -469,6 +469,22 @@ export class GameWorld {
         this.drawMatchScores();
         this.drawOverallScores();
         this._balls.forEach((ball: Ball) => ball.draw());
-        this._stick.draw();
+
+        // NEW: Draw the aim line if the stick is visible
+        if (this._stick.visible) {
+            const aimLineEnd = this._stick.getAimLineEndPosition();
+            if (aimLineEnd) {
+                // Draw the line from the cue ball's position to the calculated end point
+                Canvas2D.drawDottedLine(
+                    this._cueBall.position, // Start from the cue ball's center
+                    aimLineEnd,
+                    "rgba(255,255,255,0.7)", // White, slightly transparent
+                    2, // Line width
+                    [5, 5] // 5px dash, 5px gap
+                );
+            }
+        }
+
+        this._stick.draw(); // Draw the stick last so it's on top of the line
     }
 }

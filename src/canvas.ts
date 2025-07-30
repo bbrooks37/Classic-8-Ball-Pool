@@ -93,24 +93,65 @@ class Canvas2D_Singleton {
         this._context.restore();
     }
 
-
-    // MODIFIED drawText METHOD:
+    /**
+     * Draws text on the canvas with specified properties.
+     * @param text The text string to draw.
+     * @param font The font style (e.g., "20px Arial").
+     * @param color The text color.
+     * @param position The {x, y} coordinates for the text.
+     * @param textAlign Horizontal text alignment ('start', 'end', 'left', 'right', 'center').
+     * @param textBaseline Vertical text alignment ('top', 'hanging', 'middle', 'alphabetic', 'ideographic', 'bottom').
+     */
     public drawText(
         text: string,
         font:string,
         color: string,
         position: IVector2,
         textAlign: string = 'left',
-        textBaseline: string = 'alphabetic' // <-- ADDED THIS PARAMETER
+        textBaseline: string = 'alphabetic' // Added textBaseline parameter
     ): void {
         this._context.save();
         this._context.scale(this._scale.x, this._scale.y);
         this._context.fillStyle = color;
         this._context.font = font;
         this._context.textAlign = textAlign as CanvasTextAlign;
-        this._context.textBaseline = textBaseline as CanvasTextBaseline; // <-- ADDED THIS LINE
+        this._context.textBaseline = textBaseline as CanvasTextBaseline; // Set textBaseline
         this._context.fillText(text, position.x, position.y);
         this._context.restore();
+    }
+
+    /**
+     * Draws a dotted line on the canvas.
+     * @param startPoint The starting {x, y} coordinates of the line.
+     * @param endPoint The ending {x, y} coordinates of the line.
+     * @param color The color of the line.
+     * @param lineWidth The width of the line.
+     * @param dashPattern An array specifying the line and gap lengths (e.g., [5, 5] for 5px line, 5px gap).
+     */
+    public drawDottedLine(
+        startPoint: Vector2,
+        endPoint: Vector2,
+        color: string = "white",
+        lineWidth: number = 2,
+        dashPattern: number[] = [5, 5]
+    ): void {
+        this._context.save();
+        this._context.beginPath();
+
+        // Apply scaling to the coordinates
+        const transformedStart = new Vector2(startPoint.x * this._scale.x, startPoint.y * this._scale.y);
+        const transformedEnd = new Vector2(endPoint.x * this._scale.x, endPoint.y * this._scale.y);
+
+        this._context.moveTo(transformedStart.x, transformedStart.y);
+        this._context.lineTo(transformedEnd.x, transformedEnd.y);
+
+        this._context.strokeStyle = color;
+        this._context.lineWidth = lineWidth;
+        this._context.setLineDash(dashPattern); // Set the dotted/dashed pattern
+
+        this._context.stroke();
+        this._context.restore();
+        this._context.setLineDash([]); // Reset line dash to solid for subsequent drawings
     }
 
     public changeCursor(cursor: string): void {
