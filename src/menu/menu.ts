@@ -38,20 +38,15 @@ export class Menu {
             return new MenuButton(
                     actionsMap.get(button.action),
                     button.value,
-                    button.position, 
-                    button.sprite, 
+                    button.position,
+                    button.sprite,
                     button.spriteOnHover,
                 );
         });
 
+        // MODIFIED LABELS INITIALIZATION:
         this._labels = config.labels.map((label: ILabel) => {
-            return new MenuLabel(
-                    label.text, 
-                    label.position, 
-                    label.font, 
-                    label.color, 
-                    label.alignment
-                );
+            return new MenuLabel(label); // <-- PASS THE ENTIRE 'label' OBJECT HERE
         });
 
         this._subMenus = config.subMenus.map((menu: IMenuConfig) => {

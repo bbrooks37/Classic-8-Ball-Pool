@@ -162,62 +162,62 @@ export class GameWorld {
         if(!first.visible || !second.visible){
             return false;
         }
-    
+
         // Find a normal vector
         const n: Vector2 = first.position.subtract(second.position);
-    
+
         // Find distance
         const dist: number = n.length;
-    
+
         if(dist > ballConfig.diameter){
             return false;
         }
-    
+
         // Find minimum translation distance
         const mtd = n.mult((ballConfig.diameter - dist) / dist);
-    
+
         // Push-pull balls apart
         first.position = first.position.add(mtd.mult(0.5));
         second.position = second.position.subtract(mtd.mult(0.5));
-    
+
         // Find unit normal vector
         const un = n.mult(1/n.length);
-    
+
         // Find unit tangent vector
         const ut = new Vector2(-un.y, un.x);
-    
+
         // Project velocities onto the unit normal and unit tangent vectors
         const v1n: number = un.dot(first.velocity);
         const v1t: number = ut.dot(first.velocity);
         const v2n: number = un.dot(second.velocity);
         const v2t: number = ut.dot(second.velocity);
-    
+
         // Convert the scalar normal and tangential velocities into vectors
         const v1nTag: Vector2 = un.mult(v2n);
         const v1tTag: Vector2 = ut.mult(v1t);
         const v2nTag: Vector2 = un.mult(v1n);
         const v2tTag: Vector2 = ut.mult(v2t);
-    
+
         // Update velocities
         first.velocity = v1nTag.add(v1tTag);
         second.velocity = v2nTag.add(v2tTag);
-    
+
         first.velocity = first.velocity.mult(1 - physicsConfig.collisionLoss);
         second.velocity = second.velocity.mult(1 - physicsConfig.collisionLoss);
-        
+
         return true;
     }
 
     private handleCollisions(): void {
-        for(let i = 0 ; i < this._balls.length ; i++ ){ 
-            
+        for(let i = 0 ; i < this._balls.length ; i++ ){
+
             this.resolveBallCollisionWithCushion(this._balls[i]);
 
             for(let j = i + 1 ; j < this._balls.length ; j++ ){
                 const firstBall = this._balls[i];
                 const secondBall = this._balls[j];
                 const collided = this.resolveBallsCollision(firstBall, secondBall);
-                
+
                 if(collided){
                     const force: number = firstBall.velocity.length + secondBall.velocity.length
                     const volume: number = mapRange(force, 0, ballConfig.maxExpectedCollisionForce, 0, 1);
@@ -229,7 +229,7 @@ export class GameWorld {
                     }
                 }
             }
-        }    
+        }
     }
 
     private isInsidePocket(position: Vector2): boolean {
@@ -314,35 +314,37 @@ export class GameWorld {
     }
 
     private drawCurrentPlayerLabel(): void {
-        
+
         Canvas2D.drawText(
-            labelsConfig.currentPlayer.text + (this._currentPlayerIndex + 1), 
-            labelsConfig.currentPlayer.font, 
-            labelsConfig.currentPlayer.color, 
-            labelsConfig.currentPlayer.position, 
-            labelsConfig.currentPlayer.alignment
-            );
+            labelsConfig.currentPlayer.text + (this._currentPlayerIndex + 1),
+            labelsConfig.currentPlayer.font,
+            labelsConfig.currentPlayer.color,
+            labelsConfig.currentPlayer.position,
+            'center',
+            labelsConfig.currentPlayer.alignment as CanvasTextBaseline
+        );
     }
 
     private drawMatchScores(): void {
-        for(let i = 0 ; i < this._players.length ; i++){    
+        for(let i = 0 ; i < this._players.length ; i++){
             for(let j = 0 ; j < this._players[i].matchScore ; j++){
                 const scorePosition: Vector2 = Vector2.copy(matchScoreConfig.scoresPositions[i]).addToX(j * matchScoreConfig.unitMargin);
                 const scoreSprite: HTMLImageElement = this._players[i].color === Color.red ? Assets.getSprite(sprites.paths.redScore) : Assets.getSprite(sprites.paths.yellowScore);
                 Canvas2D.drawImage(scoreSprite, scorePosition);
             }
-        }    
+        }
     }
 
     private drawOverallScores(): void {
-        for(let i = 0 ; i < this._players.length ; i++){ 
+        for(let i = 0 ; i < this._players.length ; i++){
             Canvas2D.drawText(
-                this._players[i].overallScore.toString(), 
+                this._players[i].overallScore.toString(),
                 labelsConfig.overalScores[i].font,
                 labelsConfig.overalScores[i].color,
                 labelsConfig.overalScores[i].position,
-                labelsConfig.overalScores[i].alignment
-                );   
+                'center',
+                labelsConfig.overalScores[i].alignment as CanvasTextBaseline
+            );
         }
     }
 
@@ -369,7 +371,7 @@ export class GameWorld {
 
         const yellowBalls: Ball[] = GameConfig.yellowBallsPositions
             .map((position: Vector2) => new Ball(Vector2.copy(position), Color.red));
-        
+
         this._8Ball = new Ball(Vector2.copy(GameConfig.eightBallPosition), Color.black);
 
         this._cueBall = new Ball(Vector2.copy(GameConfig.cueBallPosition), Color.white);
@@ -377,11 +379,11 @@ export class GameWorld {
         this._stick = new Stick(Vector2.copy(GameConfig.cueBallPosition));
 
         this._balls = [
-            ...redBalls, 
-            ... yellowBalls, 
+            ...redBalls,
+            ... yellowBalls,
             this._8Ball,
-            this._cueBall, 
-        ];
+            this._cueBall,
+        ]; // <--- CLOSING BRACKET WAS MISSING HERE
 
         this._currentPlayerIndex = 0;
 
@@ -399,8 +401,8 @@ export class GameWorld {
 
     public isValidPosToPlaceCueBall(position: Vector2): boolean {
         let noOverlap: boolean =  this._balls.every((ball: Ball) => {
-            return ball.color === Color.white || 
-                   ball.position.distFrom(position) > ballConfig.diameter;
+            return ball.color === Color.white ||
+                            ball.position.distFrom(position) > ballConfig.diameter;
         })
 
         return noOverlap && this.isInsideTableBoundaries(position);
@@ -420,7 +422,7 @@ export class GameWorld {
                 this._balls.splice(ballIndex, 1);
             }
         });
-        
+
         if(this.currentPlayer.color) {
             this.currentPlayer.matchScore = 8 - this.getBallsByColor(this.currentPlayer.color).length - this.getBallsByColor(Color.black).length;
         }

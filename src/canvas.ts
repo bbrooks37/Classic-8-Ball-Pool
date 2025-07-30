@@ -13,7 +13,7 @@ class Canvas2D_Singleton {
     private _offset: Vector2;
 
     //------Properties------//
-    
+
     public get scaleX() {
         return this._scale.x;
     }
@@ -35,21 +35,21 @@ class Canvas2D_Singleton {
     constructor(canvas : HTMLCanvasElement, canvasContainer: HTMLElement) {
         this._canvasContainer = canvasContainer;
         this._canvas = canvas;
-        this._context = this._canvas.getContext('2d');
+        this._context = this._canvas.getContext('2d') as CanvasRenderingContext2D; // Added type assertion for safety
         this.resizeCanvas();
     }
 
     //------Public Methods------//
 
     public resizeCanvas(): void {
-        
+
         const originalCanvasWidth = GameConfig.gameSize.x;
         const originalCanvasHeight = GameConfig.gameSize.y;
         const widthToHeight: number = originalCanvasWidth / originalCanvasHeight;
 
         let newHeight: number = window.innerHeight;
         let newWidth: number = window.innerWidth;
-       
+
         const newWidthToHeight: number = newWidth / newHeight;
 
         if (newWidthToHeight > widthToHeight) {
@@ -57,7 +57,7 @@ class Canvas2D_Singleton {
         } else {
             newHeight = newWidth / widthToHeight;
         }
-        
+
         this._canvasContainer.style.width = newWidth + 'px';
         this._canvasContainer.style.height = newHeight + 'px';
         this._canvasContainer.style.marginTop = (window.innerHeight - newHeight) / 2 + 'px';
@@ -68,7 +68,7 @@ class Canvas2D_Singleton {
 
         this._canvas.width = newWidth;
         this._canvas.height = newHeight;
-        
+
         if (this._canvas.offsetParent) {
             this._offset = new Vector2(this._canvas.offsetLeft, this._canvas.offsetTop);
         }
@@ -81,10 +81,10 @@ class Canvas2D_Singleton {
 
     public drawImage(
             sprite: HTMLImageElement,
-            position: IVector2 = { x: 0, y: 0 }, 
-            rotation: number = 0, 
+            position: IVector2 = { x: 0, y: 0 },
+            rotation: number = 0,
             origin: IVector2 = { x: 0, y: 0 }
-        ) {    
+        ) {
         this._context.save();
         this._context.scale(this._scale.x, this._scale.y);
         this._context.translate(position.x, position.y);
@@ -94,12 +94,21 @@ class Canvas2D_Singleton {
     }
 
 
-    public drawText(text: string, font:string, color: string, position: IVector2, textAlign: string = 'left'): void {
+    // MODIFIED drawText METHOD:
+    public drawText(
+        text: string,
+        font:string,
+        color: string,
+        position: IVector2,
+        textAlign: string = 'left',
+        textBaseline: string = 'alphabetic' // <-- ADDED THIS PARAMETER
+    ): void {
         this._context.save();
         this._context.scale(this._scale.x, this._scale.y);
         this._context.fillStyle = color;
         this._context.font = font;
         this._context.textAlign = textAlign as CanvasTextAlign;
+        this._context.textBaseline = textBaseline as CanvasTextBaseline; // <-- ADDED THIS LINE
         this._context.fillText(text, position.x, position.y);
         this._context.restore();
     }
